@@ -20,6 +20,7 @@ import com.example.android.apis.R;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -33,7 +34,7 @@ public class ActivityRecreate extends Activity {
 
         if (savedInstanceState != null) {
             mCurTheme = savedInstanceState.getInt("theme");
-
+            Log.i("ActivityRecreate","mCurTheme : "+mCurTheme);
             // Switch to a new theme different from last theme.
             switch (mCurTheme) {
                 case android.R.style.Theme_Holo_Light:
@@ -46,7 +47,7 @@ public class ActivityRecreate extends Activity {
                     mCurTheme = android.R.style.Theme_Holo_Light;
                     break;
             }
-            setTheme(mCurTheme);
+            //setTheme(mCurTheme); //May cause ClassCastException
         }
 
         setContentView(R.layout.activity_recreate);

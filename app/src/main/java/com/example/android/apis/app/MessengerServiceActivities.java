@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -46,6 +47,7 @@ public class MessengerServiceActivities {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case MessengerService.MSG_SET_VALUE:
+                        Log.i("rick", "handleMessage : 3 -> "+msg.arg1);
                         mCallbackText.setText("Received from service: " + msg.arg1);
                         break;
                     default:
@@ -71,6 +73,7 @@ public class MessengerServiceActivities {
                 // service through an IDL interface, so get a client-side
                 // representation of that from the raw service object.
                 Logger.d("MessengerService,onServiceConnected,service=%s",service);
+                Log.i("Binding", "rick onServiceConnected: ");
                 mService = new Messenger(service);
                 mCallbackText.setText("Attached.");
 
@@ -103,6 +106,7 @@ public class MessengerServiceActivities {
                 // unexpectedly disconnected -- that is, its process crashed.
                 mService = null;
                 mCallbackText.setText("Disconnected.");
+                Log.i("Binding", "rick onServiceDisconnected: ");
 
                 // As part of the sample, tell the user what happened.
                 Toast.makeText(Binding.this, R.string.remote_service_disconnected,
@@ -114,6 +118,7 @@ public class MessengerServiceActivities {
             // Establish a connection with the service.  We use an explicit
             // class name because there is no reason to be able to let other
             // applications replace our component.
+            Log.i("Binding", "rick doBindService: ");
             bindService(new Intent(Binding.this, 
                     MessengerService.class), mConnection, Context.BIND_AUTO_CREATE);
             mIsBound = true;
@@ -121,6 +126,7 @@ public class MessengerServiceActivities {
         }
         
         void doUnbindService() {
+
             if (mIsBound) {
                 // If we have received the service, and hence registered with
                 // it, then now is the time to unregister.

@@ -30,6 +30,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -130,7 +131,7 @@ public class MessengerService extends Service {
     public void onDestroy() {
         // Cancel the persistent notification.
         mNM.cancel(R.string.remote_service_started);
-
+        Log.i("Messenger", "onDestroy: "+getString(R.string.remote_service_stopped));
         // Tell the user we stopped.
         Toast.makeText(this, R.string.remote_service_stopped, Toast.LENGTH_SHORT).show();
     }

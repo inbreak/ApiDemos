@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 
 
 /**
@@ -37,13 +38,14 @@ import android.widget.Button;
  */
 public class Animation extends Activity {
     private static final String TAG = "Animation";
+    private ImageView mCacheImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_animation);
-
+        mCacheImage = (ImageView) findViewById(R.id.cacheImage);
         // Watch for button clicks.
         Button button = (Button)findViewById(R.id.fade_animation);
         button.setOnClickListener(mFadeListener);
@@ -171,4 +173,14 @@ public class Animation extends Activity {
             overridePendingTransition(0, 0);
         }
     };
+
+    //显示缩略图
+    private void setCacheImageView(View v){
+        v.setDrawingCacheEnabled(true);
+        v.setPressed(false);
+        v.refreshDrawableState();
+        Bitmap bm = Bitmap.createBitmap(v.getDrawingCache());
+        mCacheImage.setImageBitmap(bm);
+        v.setDrawingCacheEnabled(false);
+    }
 }

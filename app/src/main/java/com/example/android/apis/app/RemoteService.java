@@ -35,6 +35,7 @@ import android.os.Message;
 import android.os.Process;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -62,7 +63,7 @@ public class RemoteService extends Service {
      * service.  Note that this is package scoped (instead of private) so
      * that it can be accessed more efficiently from inner classes.
      */
-    final RemoteCallbackList<IRemoteServiceCallback> mCallbacks
+    final RemoteCallbackList<IRemoteServiceCallback> myCallbacks
             = new RemoteCallbackList<>();
     
     int mValue = 0;
@@ -90,6 +91,7 @@ public class RemoteService extends Service {
 
     @Override
     public void onDestroy() {
+        Logger.d("RemoteService", "== onDestroy() ==");
         // Cancel the persistent notification.
         mNM.cancel(R.string.remote_service_started);
 
@@ -97,7 +99,7 @@ public class RemoteService extends Service {
         Toast.makeText(this, R.string.remote_service_stopped, Toast.LENGTH_SHORT).show();
         
         // Unregister all callbacks.
-        mCallbacks.kill();
+        myCallbacks.kill();
         
         // Remove the next pending message to increment the counter, stopping
         // the increment loop.
@@ -126,11 +128,11 @@ public class RemoteService extends Service {
     private final IRemoteService.Stub mBinder = new IRemoteService.Stub() {
         public void registerCallback(IRemoteServiceCallback cb) {
             Logger.d("registerCallback",cb);
-            if (cb != null) mCallbacks.register(cb);
+            if (cb != null) myCallbacks.register(cb);
         }
         public void unregisterCallback(IRemoteServiceCallback cb) {
             Logger.d("unregisterCallback:",cb);
-            if (cb != null) mCallbacks.unregister(cb);
+            if (cb != null) myCallbacks.unregister(cb);
         }
     };
 
@@ -159,7 +161,8 @@ public class RemoteService extends Service {
      * to schedule increments of our value.
      */
     private final Handler mHandler = new Handler() {
-        @Override public void handleMessage(Message msg) {
+        @Override
+        public void handleMessage(Message msg) {
             switch (msg.what) {
                 
                 // It is time to bump the value!
@@ -168,19 +171,20 @@ public class RemoteService extends Service {
                     int value = ++mValue;
                     
                     // Broadcast to all clients the new value.
-                    final int N = mCallbacks.beginBroadcast();
+                    final int N = myCallbacks.beginBroadcast();
+                    Log.i("rick", "handleMessage: N = "+N);
                     for (int i=0; i<N; i++) {
                         try {
-                            mCallbacks.getBroadcastItem(i).valueChanged(value);
+                            myCallbacks.getBroadcastItem(i).valueChanged(value);
                         } catch (RemoteException e) {
                             // The RemoteCallbackList will take care of removing
                             // the dead object for us.
                         }
                     }
-                    mCallbacks.finishBroadcast();
+                    myCallbacks.finishBroadcast();
                     
                     // Repeat every 1 second.
-                    sendMessageDelayed(obtainMessage(REPORT_MSG), 1*1000);
+                    sendMessageDelayed(obtainMessage(REPORT_MSG), 5*1000);
                 } break;
                 default:
                     super.handleMessage(msg);
@@ -426,6 +430,7 @@ public class RemoteService extends Service {
                         // processes created by that app as shown here; packages
                         // sharing a common UID will also be able to kill each
                         // other's processes.
+                        Log.i("rick", "onKillClick -> client pid:"+Process.myPid()+" , service pid: "+ pid);
                         Process.killProcess(pid);
                         mCallbackText.setText("Killed service process.");
                     } catch (RemoteException ex) {
@@ -596,7 +601,7 @@ public class RemoteService extends Service {
                     mCurConnection = null;
                 }
                 ServiceConnection conn = new MyServiceConnection();
-                if (bindService(new Intent(IRemoteService.class.getName()),
+                if (bindService(mBindIntent,
                         conn, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT)) {
                     mCurConnection = conn;
                 }

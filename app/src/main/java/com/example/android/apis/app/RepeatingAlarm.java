@@ -23,6 +23,8 @@ import com.example.android.apis.R;
 import android.content.Context;
 import android.content.Intent;
 import android.content.BroadcastReceiver;
+import android.os.SystemClock;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -34,6 +36,7 @@ public class RepeatingAlarm extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
+        Log.i("rick","RepeatingAlarm -> onReceive : "+ SystemClock.elapsedRealtime());
         Toast.makeText(context, R.string.repeating_received, Toast.LENGTH_SHORT).show();
     }
 }

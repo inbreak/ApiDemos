@@ -77,6 +77,7 @@ public class LocalService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.i("rick", "LocalService onDestroy");
         // Cancel the persistent notification.
         mNM.cancel(NOTIFICATION);
 
@@ -86,7 +87,20 @@ public class LocalService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.i("rick", "LocalService onBind");
         return mBinder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.i("rick", "LocalService onUnbind");
+        return true;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        Log.i("rick", "LocalService onRebind");
+        super.onRebind(intent);
     }
 
     // This is the object that receives interactions from clients.  See

@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
+import android.support.annotation.IntDef;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -57,6 +58,12 @@ public class IsolatedService extends Service {
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("IsolatedService", "rick onStartCommand");
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
     public void onDestroy() {
         Log.i("IsolatedService", "Destroying IsolatedService: " + this);
         // Unregister all callbacks.
@@ -65,7 +72,20 @@ public class IsolatedService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.i("IsolatedService", "rick onBind");
         return mBinder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.i("IsolatedService", "rick onUnbind");
+        return true;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        Log.i("IsolatedService", "rick onRebind");
+        super.onRebind(intent);
     }
 
     /**
@@ -73,16 +93,18 @@ public class IsolatedService extends Service {
      */
     private final IRemoteService.Stub mBinder = new IRemoteService.Stub() {
         public void registerCallback(IRemoteServiceCallback cb) {
+            Log.i("IsolatedService", "rick registerCallback");
             if (cb != null) mCallbacks.register(cb);
         }
         public void unregisterCallback(IRemoteServiceCallback cb) {
+            Log.i("IsolatedService", "rick unregisterCallback");
             if (cb != null) mCallbacks.unregister(cb);
         }
     };
     
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Log.i("IsolatedService", "Task removed in " + this + ": " + rootIntent);
+        Log.i("IsolatedService", "rick Task removed in " + this + ": " + rootIntent);
         stopSelf();
     }
 
@@ -124,26 +146,32 @@ public class IsolatedService extends Service {
             }
 
             void destroy() {
+                Log.i("rick", "destroy()");
                 if (mServiceBound) {
+                    Log.i("rick", "destroy() mServiceBound");
                     mActivity.unbindService(mConnection);
                 }
             }
 
             private OnClickListener mStartListener = new OnClickListener() {
                 public void onClick(View v) {
+                    Log.i("rick", "mStartListener -> "+mClz);
                     mActivity.startService(new Intent(mActivity, mClz));
                 }
             };
 
             private OnClickListener mStopListener = new OnClickListener() {
                 public void onClick(View v) {
+                    Log.i("rick", "mStopListener -> "+mClz);
                     mActivity.stopService(new Intent(mActivity, mClz));
                 }
             };
 
             private OnClickListener mBindListener = new OnClickListener() {
                 public void onClick(View v) {
+
                     if (((CheckBox)v).isChecked()) {
+                        Log.i("rick", "mBindListener checked -> "+mServiceBound);
                         if (!mServiceBound) {
                             if (mActivity.bindService(new Intent(mActivity, mClz),
                                     mConnection, Context.BIND_AUTO_CREATE)) {
@@ -152,10 +180,11 @@ public class IsolatedService extends Service {
                             }
                         }
                     } else {
+                        Log.i("rick", "mBindListener unchecked -> "+mServiceBound);
                         if (mServiceBound) {
                             mActivity.unbindService(mConnection);
                             mServiceBound = false;
-                            mStatus.setText("");
+                            mStatus.setText("XXX");
                         }
                     }
                 }
@@ -164,6 +193,7 @@ public class IsolatedService extends Service {
             private ServiceConnection mConnection = new ServiceConnection() {
                 public void onServiceConnected(ComponentName className,
                         IBinder service) {
+                    Log.i("rick", "onServiceConnected -> "+mServiceBound);
                     mService = IRemoteService.Stub.asInterface(service);
                     if (mServiceBound) {
                         mStatus.setText("CONNECTED");
@@ -173,6 +203,7 @@ public class IsolatedService extends Service {
                 public void onServiceDisconnected(ComponentName className) {
                     // This is called when the connection with the service has been
                     // unexpectedly disconnected -- that is, its process crashed.
+                    Log.i("rick", "onServiceDisconnected -> "+mServiceBound);
                     mService = null;
                     if (mServiceBound) {
                         mStatus.setText("DISCONNECTED");
@@ -189,7 +220,7 @@ public class IsolatedService extends Service {
             super.onCreate(savedInstanceState);
 
             setContentView(R.layout.isolated_service_controller);
-
+            Log.i("rick", "Controller - onCreate");
             mService1 = new ServiceInfo(this, IsolatedService.class, R.id.start1, R.id.stop1,
                     R.id.bind1, R.id.status1);
             mService2 = new ServiceInfo(this, IsolatedService2.class, R.id.start2, R.id.stop2,
@@ -199,6 +230,7 @@ public class IsolatedService extends Service {
         @Override
         protected void onDestroy() {
             super.onDestroy();
+            Log.i("rick", "Controller - onDestroy");
             mService1.destroy();
             mService2.destroy();
         }

@@ -16,8 +16,6 @@
 
 package com.example.android.apis.nfc;
 
-import com.example.android.apis.R;
-
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -28,6 +26,8 @@ import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+
+import com.example.android.apis.R;
 
 /**
  * An example of how to use the NFC foreground dispatch APIs. This will intercept any MIME data
@@ -48,7 +48,7 @@ public class ForegroundDispatch extends Activity {
         setContentView(R.layout.foreground_dispatch);
         mText = (TextView) findViewById(R.id.text);
         mText.setText("Scan a tag");
-
+        Log.i("ForegroundDispatch", "rick onCreate: ");
         mAdapter = NfcAdapter.getDefaultAdapter(this);
 
         // Create a generic PendingIntent that will be deliver to this activity. The NFC stack
@@ -64,30 +64,36 @@ public class ForegroundDispatch extends Activity {
         } catch (MalformedMimeTypeException e) {
             throw new RuntimeException("fail", e);
         }
-        mFilters = new IntentFilter[] {
+        mFilters = new IntentFilter[]{
                 ndef,
         };
 
         // Setup a tech list for all NfcF tags
-        mTechLists = new String[][] { new String[] { NfcF.class.getName() } };
+        mTechLists = new String[][]{new String[]{NfcF.class.getName()}};
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (mAdapter != null) mAdapter.enableForegroundDispatch(this, mPendingIntent, mFilters,
-                mTechLists);
+        Log.i("ForegroundDispatch", "rick onResume: " + mAdapter);
+        if (mAdapter != null) {
+            mAdapter.enableForegroundDispatch(this, mPendingIntent, mFilters,
+                    mTechLists);
+        }
     }
 
     @Override
     public void onNewIntent(Intent intent) {
-        Log.i("Foreground dispatch", "Discovered tag with intent: " + intent);
+        Log.i("Foreground dispatch", "rick Discovered tag with intent: " + intent);
         mText.setText("Discovered tag " + ++mCount + " with intent: " + intent);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (mAdapter != null) mAdapter.disableForegroundDispatch(this);
+        Log.i("ForegroundDispatch", "rick onPause: " + mAdapter);
+        if (mAdapter != null) {
+            mAdapter.disableForegroundDispatch(this);
+        }
     }
 }

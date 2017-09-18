@@ -19,6 +19,7 @@ package com.example.android.apis.app;
 import android.content.Context;
 import android.content.Intent;
 import android.content.BroadcastReceiver;
+import android.util.Log;
 import android.widget.Toast;
 
 // Need the following import to get access to the app resources, since this
@@ -36,6 +37,7 @@ public class OneShotAlarm extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
+        Log.i("rick","OneShotAlarm -> onReceive : "+System.currentTimeMillis());
         Toast.makeText(context, R.string.one_shot_received, Toast.LENGTH_SHORT).show();
     }
 }

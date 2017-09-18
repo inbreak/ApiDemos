@@ -1568,6 +1568,8 @@
 
     <string name="mms_enable_receiver">Enable MMS broadcast receiver</string>
 
+    <string name="process" translate="false"><xliff:g id="x" /></string>
+
     <string name="process_text_title">Content/Process Text Intent</string>
     <string name="process_text_received_text_title">Received text selection</string>
     <string name="process_text_finish_readonly">Finish</string>

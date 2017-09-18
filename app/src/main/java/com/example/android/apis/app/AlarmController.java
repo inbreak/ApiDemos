@@ -26,6 +26,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.SystemClock;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -91,10 +92,11 @@ public class AlarmController extends Activity {
             Intent intent = new Intent(AlarmController.this, OneShotAlarm.class);
             PendingIntent sender = PendingIntent.getBroadcast(AlarmController.this,
                     0, intent, 0);
-
+            long start = System.currentTimeMillis();
+            Log.i("rick","OneShotAlarm -> start : "+start);
             // We want the alarm to go off 30 seconds from now.
             Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.setTimeInMillis(start);
             calendar.add(Calendar.SECOND, 30);
 
             // Schedule the alarm!
@@ -126,8 +128,9 @@ public class AlarmController extends Activity {
             
             // We want the alarm to go off 30 seconds from now.
             long firstTime = SystemClock.elapsedRealtime();
+            Log.i("rick","mStartRepeatingListener firstTime 1: "+firstTime);
             firstTime += 15*1000;
-
+            Log.i("rick","mStartRepeatingListener firstTime 2: "+firstTime);
             // Schedule the alarm!
             AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
             am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
